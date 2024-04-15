@@ -65,7 +65,7 @@ async def get_slots(
         raise HTTPException(status_code=422, detail="The start datetime should not be less than the current datetime.")
     if end_datetime < start_datetime:
         raise HTTPException(status_code=422, detail="The end datetime should not be less than the start datetime.")
-    if not is_same_day(start_datetime, end_datetime):
+    if not is_same_day(startDateTime, endDateTime):
         raise HTTPException(status_code=422, detail="Please ensure that the start datetime and end datetime are from the same day.")
     try:
         calendar_id = expert_calendar_id.get(expertName)
@@ -92,7 +92,11 @@ def format_datetime(dt_str: str) -> datetime:
     return datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=pytz.utc)
 
 def is_same_day(datetime1: datetime, datetime2: datetime) -> bool:
-    return datetime1.date() == datetime2.date()
+    datetime1_iso = datetime.fromisoformat(datetime1)
+    local_datetime1 = datetime1_iso.astimezone(pytz.timezone('Asia/Kolkata'))
+    datetime2_iso = datetime.fromisoformat(datetime2)
+    local_datetime2 = datetime2_iso.astimezone(pytz.timezone('Asia/Kolkata'))
+    return local_datetime1.date() == local_datetime2.date()
 
 def find_free_slots(start_time, end_time, schedule):
     slots = []
